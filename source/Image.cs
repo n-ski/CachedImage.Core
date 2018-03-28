@@ -20,14 +20,14 @@ namespace CachedImage
 
         public string ImageUrl
         {
-            get { return (string)GetValue(ImageUrlProperty); }
-            set { SetValue(ImageUrlProperty, value); }
+            get => (string)GetValue(ImageUrlProperty);
+            set => SetValue(ImageUrlProperty, value);
         }
 
         public BitmapCreateOptions CreateOptions
         {
-            get { return ((BitmapCreateOptions)(base.GetValue(Image.CreateOptionsProperty))); }
-            set { base.SetValue(Image.CreateOptionsProperty, value); }
+            get => ((BitmapCreateOptions)(base.GetValue(Image.CreateOptionsProperty)));
+            set => base.SetValue(Image.CreateOptionsProperty, value);
         }
 
         private static async void ImageUrlPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)

@@ -88,11 +88,11 @@ namespace CachedImage
 
                 using (responseStream)
                 {
-                    var bytebuffer = new byte[100];
+                    var bytebuffer = new byte[1024];
                     int bytesRead;
                     do
                     {
-                        bytesRead = await responseStream.ReadAsync(bytebuffer, 0, 100);
+                        bytesRead = await responseStream.ReadAsync(bytebuffer, 0, 1024);
                         if (fileStream != null)
                             await fileStream.WriteAsync(bytebuffer, 0, bytesRead);
                         await memoryStream.WriteAsync(bytebuffer, 0, bytesRead);

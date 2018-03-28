@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Net.Cache;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -27,6 +28,12 @@ namespace CachedImage
             set => SetValue(ImageUrlProperty, value);
         }
 
+        public BitmapImage FailedImage
+        {
+            get => (BitmapImage)GetValue(FailedImageProperty);
+            set => SetValue(FailedImageProperty, value);
+        }
+
         private bool _isLoading;
         public bool IsLoading
         {
@@ -43,20 +50,27 @@ namespace CachedImage
             get => ((BitmapCreateOptions)(base.GetValue(Image.CreateOptionsProperty)));
             set => base.SetValue(Image.CreateOptionsProperty, value);
         }
+        
+        private static void FailedImageUrlPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
 
         private static async void ImageUrlPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
             var url = (String)e.NewValue;
             var cachedImage = (Image)obj;
-
-            if (String.IsNullOrEmpty(url))
-                return;
-
-            cachedImage.Source = await LoadImageAsync(url, ((Image)obj));
+            
+            cachedImage.Source = await LoadImageAsync(url, cachedImage);
+            cachedImage.IsLoading = false;
         }
         
         private static async Task<BitmapImage> LoadImageAsync(string url, Image img)
         {
+            if (String.IsNullOrEmpty(url))
+            {
+                return img.FailedImage;
+            }
+
             var bitmapImage = new BitmapImage();
             img.IsLoading = true;
 
@@ -69,8 +83,8 @@ namespace CachedImage
                     // Enable IE-like cache policy.
                     bitmapImage.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.Default);
                     bitmapImage.EndInit();
-                    bitmapImage.Freeze();
-                    img.IsLoading = false;
+                    if (bitmapImage.CanFreeze)
+                        bitmapImage.Freeze();
                     return bitmapImage;
 
                 case FileCache.CacheMode.Dedicated:
@@ -79,32 +93,34 @@ namespace CachedImage
                         var memoryStream = await FileCache.HitAsync(url);
                         if (memoryStream == null)
                         {
-                            Console.WriteLine("No hit for URL " + url);
-                            return null;
+                            Debug.WriteLine("No hit for URL " + url);
+                            img.IsLoading = false;
+                            return img.FailedImage;
                         }
 
                         bitmapImage.BeginInit();
                         bitmapImage.CreateOptions = img.CreateOptions;
                         bitmapImage.StreamSource = memoryStream;
                         bitmapImage.EndInit();
-                        img.IsLoading = false;
                         return bitmapImage;
                     }
                     catch (Exception)
                     {
                         // ignored, in case the downloaded file is a broken or not an image.
-                        Console.WriteLine("Ignored Dedicated fail");
-                        img.IsLoading = false;
-                        return null;
+                        Debug.WriteLine($"Image with url {url} failed to load.");
+                        return img.FailedImage;
                     }
 
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
-
+        
         public static readonly DependencyProperty ImageUrlProperty = DependencyProperty.Register("ImageUrl",
             typeof(string), typeof(Image), new PropertyMetadata("", ImageUrlPropertyChanged));
+        
+        public static readonly DependencyProperty FailedImageProperty = DependencyProperty.Register("FailedImage",
+            typeof(BitmapImage), typeof(Image), new PropertyMetadata(null, FailedImageUrlPropertyChanged));
 
         public static readonly DependencyProperty CreateOptionsProperty = DependencyProperty.Register("CreateOptions",
             typeof(BitmapCreateOptions), typeof(Image));

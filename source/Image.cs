@@ -34,6 +34,18 @@ namespace CachedImage
             set => SetValue(FailedImageProperty, value);
         }
 
+        public int DecodePixelWidth
+        {
+            get => (int)GetValue(DecodePixelWidthProperty);
+            set => SetValue(DecodePixelWidthProperty, value);
+        }
+
+        public int DecodePixelHeight
+        {
+            get => (int)GetValue(DecodePixelHeightProperty);
+            set => SetValue(DecodePixelHeightProperty, value);
+        }
+
         private bool _isLoading;
         public bool IsLoading
         {
@@ -79,6 +91,12 @@ namespace CachedImage
                 case FileCache.CacheMode.WinINet:
                     bitmapImage.BeginInit();
                     bitmapImage.CreateOptions = img.CreateOptions;
+
+                    if (img.DecodePixelHeight > 0)
+                        bitmapImage.DecodePixelHeight = img.DecodePixelHeight;
+                    if (img.DecodePixelWidth > 0)
+                        bitmapImage.DecodePixelWidth = img.DecodePixelWidth;
+
                     bitmapImage.UriSource = new Uri(url);
                     // Enable IE-like cache policy.
                     bitmapImage.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.Default);
@@ -100,6 +118,12 @@ namespace CachedImage
 
                         bitmapImage.BeginInit();
                         bitmapImage.CreateOptions = img.CreateOptions;
+
+                        if (img.DecodePixelHeight > 0)
+                            bitmapImage.DecodePixelHeight = img.DecodePixelHeight;
+                        if (img.DecodePixelWidth > 0)
+                            bitmapImage.DecodePixelWidth = img.DecodePixelWidth;
+
                         bitmapImage.StreamSource = memoryStream;
                         bitmapImage.EndInit();
                         return bitmapImage;
@@ -124,6 +148,13 @@ namespace CachedImage
 
         public static readonly DependencyProperty CreateOptionsProperty = DependencyProperty.Register("CreateOptions",
             typeof(BitmapCreateOptions), typeof(Image));
+
+
+        public static readonly DependencyProperty DecodePixelWidthProperty = DependencyProperty.Register("DecodePixelWidth",
+            typeof(int), typeof(Image), new PropertyMetadata(-1, FailedImageUrlPropertyChanged));
+
+        public static readonly DependencyProperty DecodePixelHeightProperty = DependencyProperty.Register("DecodePixelHeight",
+            typeof(int), typeof(Image), new PropertyMetadata(-1, FailedImageUrlPropertyChanged));
 
 
         public event PropertyChangedEventHandler PropertyChanged;

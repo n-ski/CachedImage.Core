@@ -3,6 +3,20 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
+    <Authors>Hari Pachuveetil, Tylor Pater, Sergey Volkov</Authors>
+    <Description>A WPF control that wraps the Image control with some filesystem caching, ported to .NET Core 3.1 for use with .NET Core WPF applications</Description>
+    <Version>1.0.3</Version>
+    <Copyright>MIT © Haridas Pachuveetil  2014</Copyright>
+    <PackageProjectUrl>https://github.com/n-ski/CachedImage.Core</PackageProjectUrl>
+    <PackageTags>WPF Cache Image Control</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

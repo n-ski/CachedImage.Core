@@ -139,6 +139,10 @@ namespace CachedImage.Core
 
                         bitmapImage.StreamSource = memoryStream;
                         bitmapImage.EndInit();
+                        if (bitmapImage.CanFreeze)
+                        {
+                            bitmapImage.Freeze();
+                        }
                         return bitmapImage;
                     }
                     catch (Exception)

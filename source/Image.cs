@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 
 // Thank you, Jeroen van Langen - http://stackoverflow.com/a/5175424/218882 and Ivan Leonenko - http://stackoverflow.com/a/12638859/218882
 
-namespace CachedImage
+namespace CachedImage.Core
 {
     /// <summary>
     ///     Represents a control that is a wrapper on System.Windows.Controls.Image for enabling filesystem-based caching

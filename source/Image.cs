@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 namespace CachedImage.Core
 {
     /// <summary>
-    ///     Represents a control that is a wrapper on System.Windows.Controls.Image for enabling filesystem-based caching
+    /// Represents a control that is a wrapper on System.Windows.Controls.Image for enabling filesystem-based caching
     /// </summary>
     public class Image : System.Windows.Controls.Image, INotifyPropertyChanged
     {
@@ -21,6 +21,8 @@ namespace CachedImage.Core
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Image),
                 new FrameworkPropertyMetadata(typeof(Image)));
         }
+
+
         
         public string ImageUrl
         {
@@ -59,17 +61,18 @@ namespace CachedImage.Core
 
         public BitmapCreateOptions CreateOptions
         {
-            get => ((BitmapCreateOptions)(base.GetValue(Image.CreateOptionsProperty)));
-            set => base.SetValue(Image.CreateOptionsProperty, value);
+            get => (BitmapCreateOptions)GetValue(CreateOptionsProperty);
+            set => SetValue(CreateOptionsProperty, value);
         }
+
+
         
-        private static void FailedImageUrlPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-        }
+        private static void FailedImageUrlPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        { }
 
         private static async void ImageUrlPropertyChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
-            var url = (String)e.NewValue;
+            var url = (string)e.NewValue;
             var cachedImage = (Image)obj;
             
             cachedImage.Source = await LoadImageAsync(url, cachedImage);
@@ -78,7 +81,7 @@ namespace CachedImage.Core
         
         private static async Task<BitmapImage> LoadImageAsync(string url, Image img)
         {
-            if (String.IsNullOrEmpty(url))
+            if (string.IsNullOrEmpty(url))
             {
                 return img.FailedImage;
             }
@@ -93,16 +96,22 @@ namespace CachedImage.Core
                     bitmapImage.CreateOptions = img.CreateOptions;
 
                     if (img.DecodePixelHeight > 0)
+                    {
                         bitmapImage.DecodePixelHeight = img.DecodePixelHeight;
+                    }
                     if (img.DecodePixelWidth > 0)
+                    {
                         bitmapImage.DecodePixelWidth = img.DecodePixelWidth;
+                    }
 
                     bitmapImage.UriSource = new Uri(url);
                     // Enable IE-like cache policy.
                     bitmapImage.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.Default);
                     bitmapImage.EndInit();
                     if (bitmapImage.CanFreeze)
+                    {
                         bitmapImage.Freeze();
+                    }
                     return bitmapImage;
 
                 case FileCache.CacheMode.Dedicated:
@@ -120,9 +129,13 @@ namespace CachedImage.Core
                         bitmapImage.CreateOptions = img.CreateOptions;
 
                         if (img.DecodePixelHeight > 0)
+                        {
                             bitmapImage.DecodePixelHeight = img.DecodePixelHeight;
+                        }
                         if (img.DecodePixelWidth > 0)
+                        {
                             bitmapImage.DecodePixelWidth = img.DecodePixelWidth;
+                        }
 
                         bitmapImage.StreamSource = memoryStream;
                         bitmapImage.EndInit();
@@ -139,22 +152,25 @@ namespace CachedImage.Core
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+
         
-        public static readonly DependencyProperty ImageUrlProperty = DependencyProperty.Register("ImageUrl",
+        public static readonly DependencyProperty ImageUrlProperty = DependencyProperty.Register(nameof(ImageUrl),
             typeof(string), typeof(Image), new PropertyMetadata("", ImageUrlPropertyChanged));
         
-        public static readonly DependencyProperty FailedImageProperty = DependencyProperty.Register("FailedImage",
+        public static readonly DependencyProperty FailedImageProperty = DependencyProperty.Register(nameof(FailedImage),
             typeof(BitmapImage), typeof(Image), new PropertyMetadata(null, FailedImageUrlPropertyChanged));
 
-        public static readonly DependencyProperty CreateOptionsProperty = DependencyProperty.Register("CreateOptions",
+        public static readonly DependencyProperty CreateOptionsProperty = DependencyProperty.Register(nameof(CreateOptions),
             typeof(BitmapCreateOptions), typeof(Image));
 
 
-        public static readonly DependencyProperty DecodePixelWidthProperty = DependencyProperty.Register("DecodePixelWidth",
+        public static readonly DependencyProperty DecodePixelWidthProperty = DependencyProperty.Register(nameof(DecodePixelWidth),
             typeof(int), typeof(Image), new PropertyMetadata(-1, FailedImageUrlPropertyChanged));
 
-        public static readonly DependencyProperty DecodePixelHeightProperty = DependencyProperty.Register("DecodePixelHeight",
+        public static readonly DependencyProperty DecodePixelHeightProperty = DependencyProperty.Register(nameof(DecodePixelHeight),
             typeof(int), typeof(Image), new PropertyMetadata(-1, FailedImageUrlPropertyChanged));
+
 
 
         public event PropertyChangedEventHandler PropertyChanged;

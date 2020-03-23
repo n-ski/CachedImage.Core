@@ -18,7 +18,9 @@ namespace CachedImage.Core
         }
 
         // Record whether a file is being written.
-        private static readonly Dictionary<string, bool> IsWritingFile = new Dictionary<string, bool>();
+        private static readonly Dictionary<string, bool> _isWritingFile = new Dictionary<string, bool>();
+
+
 
         static FileCache()
         {
@@ -30,17 +32,21 @@ namespace CachedImage.Core
             AppCacheMode = CacheMode.WinINet;
         }
 
+
+
         /// <summary>
-        ///     Gets or sets the path to the folder that stores the cache file. Only works when AppCacheMode is
-        ///     CacheMode.Dedicated.
+        /// Gets or sets the path to the folder that stores the cache file. Only works when AppCacheMode is
+        /// CacheMode.Dedicated.
         /// </summary>
         public static string AppCacheDirectory { get; set; }
 
         /// <summary>
-        ///     Gets or sets the cache mode. WinINet is recommended, it's provided by .Net Framework and uses the Temporary Files
-        ///     of IE and the same cache policy of IE.
+        /// Gets or sets the cache mode. WinINet is recommended, it's provided by .Net Framework and uses the Temporary Files
+        /// of IE and the same cache policy of IE.
         /// </summary>
         public static CacheMode AppCacheMode { get; set; }
+
+
 
         public static async Task<MemoryStream> HitAsync(string url)
         {
@@ -48,15 +54,23 @@ namespace CachedImage.Core
             {
                 Directory.CreateDirectory(AppCacheDirectory);
             }
-            var uri = new Uri(url);
+
+            if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+            {
+                return null;
+            }
+
             var fileNameBuilder = new StringBuilder();
             using (var sha1 = new SHA1Managed())
             {
                 var canonicalUrl = uri.ToString();
                 var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(canonicalUrl));
                 fileNameBuilder.Append(BitConverter.ToString(hash).Replace("-", "").ToLower());
+
                 if (Path.HasExtension(canonicalUrl))
+                {
                     fileNameBuilder.Append(Path.GetExtension(canonicalUrl.Split('?')[0]));
+                }
             }
 
             var fileName = fileNameBuilder.ToString();
@@ -64,7 +78,7 @@ namespace CachedImage.Core
             var memoryStream = new MemoryStream();
 
             FileStream fileStream = null;
-            if (!IsWritingFile.ContainsKey(fileName) && File.Exists(localFile))
+            if (!_isWritingFile.ContainsKey(fileName) && File.Exists(localFile))
             {
                 using (fileStream = new FileStream(localFile, FileMode.Open, FileAccess.Read))
                 {
@@ -80,11 +94,15 @@ namespace CachedImage.Core
             {
                 var response = await request.GetResponseAsync();
                 var responseStream = response.GetResponseStream();
+
                 if (responseStream == null)
-                    return null;
-                if (!IsWritingFile.ContainsKey(fileName))
                 {
-                    IsWritingFile[fileName] = true;
+                    return null;
+                }
+
+                if (!_isWritingFile.ContainsKey(fileName))
+                {
+                    _isWritingFile[fileName] = true;
                     fileStream = new FileStream(localFile, FileMode.Create, FileAccess.Write);
                 }
 
@@ -96,14 +114,17 @@ namespace CachedImage.Core
                     {
                         bytesRead = await responseStream.ReadAsync(bytebuffer, 0, 1024);
                         if (fileStream != null)
+                        {
                             await fileStream.WriteAsync(bytebuffer, 0, bytesRead);
+                        }
+
                         await memoryStream.WriteAsync(bytebuffer, 0, bytesRead);
                     } while (bytesRead > 0);
                     if (fileStream != null)
                     {
                         await fileStream.FlushAsync();
                         fileStream.Dispose();
-                        IsWritingFile.Remove(fileName);
+                        _isWritingFile.Remove(fileName);
                     }
                 }
                 memoryStream.Seek(0, SeekOrigin.Begin);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,7 @@ namespace CachedImage.Core
 
         // Record whether a file is being written.
         private static readonly Dictionary<string, bool> _isWritingFile = new Dictionary<string, bool>();
+        private static readonly HttpClient _httpClient = new HttpClient();
 
 
 
@@ -88,12 +90,9 @@ namespace CachedImage.Core
                 return memoryStream;
             }
 
-            var request = WebRequest.Create(uri);
-            request.Timeout = 30;
             try
             {
-                var response = await request.GetResponseAsync();
-                var responseStream = response.GetResponseStream();
+                var responseStream = await _httpClient.GetStreamAsync(uri);
 
                 if (responseStream == null)
                 {
@@ -130,7 +129,7 @@ namespace CachedImage.Core
                 memoryStream.Seek(0, SeekOrigin.Begin);
                 return memoryStream;
             }
-            catch (WebException)
+            catch (HttpRequestException)
             {
                 return null;
             }

@@ -23,9 +23,8 @@ namespace CachedImage
         static FileCache()
         {
             // default cache directory - can be changed if needed from App.xaml
-            AppCacheDirectory = string.Format("{0}\\{1}\\Cache\\",
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                Process.GetCurrentProcess().ProcessName);
+            AppCacheDirectory =
+                $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\{Process.GetCurrentProcess().ProcessName}\\Cache\\";
             AppCacheMode = CacheMode.WinINet;
         }
 
@@ -55,11 +54,11 @@ namespace CachedImage
                 var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(canonicalUrl));
                 fileNameBuilder.Append(BitConverter.ToString(hash).Replace("-", "").ToLower());
                 if (Path.HasExtension(canonicalUrl))
-                    fileNameBuilder.Append(Path.GetExtension(canonicalUrl));
+                    fileNameBuilder.Append(Path.GetExtension(canonicalUrl.Split('?')[0]));
             }
 
             var fileName = fileNameBuilder.ToString();
-            var localFile = string.Format("{0}\\{1}", AppCacheDirectory, fileName);
+            var localFile = $"{AppCacheDirectory}\\{fileName}";
             var memoryStream = new MemoryStream();
 
             FileStream fileStream = null;
@@ -89,11 +88,11 @@ namespace CachedImage
 
                 using (responseStream)
                 {
-                    var bytebuffer = new byte[100];
+                    var bytebuffer = new byte[1024];
                     int bytesRead;
                     do
                     {
-                        bytesRead = await responseStream.ReadAsync(bytebuffer, 0, 100);
+                        bytesRead = await responseStream.ReadAsync(bytebuffer, 0, 1024);
                         if (fileStream != null)
                             await fileStream.WriteAsync(bytebuffer, 0, bytesRead);
                         await memoryStream.WriteAsync(bytebuffer, 0, bytesRead);

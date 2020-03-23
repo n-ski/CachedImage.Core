@@ -1,14 +1,11 @@
 [![NuGet version](https://badge.fury.io/nu/CachedImage.Core.png)](https://badge.fury.io/nu/CachedImage.Core)
-===========
 
-<a href="http://floydpink.github.io/CachedImage/"><img src="http://floydpink.github.io/CachedImage/images/logo.png" alt="logo" width="300px" /></a>
-
-A WPF control that wraps the Image control to enable file-system based caching.
+A WPF control that wraps the Image control to enable file-system based caching, ported to .NET Core 3.1 for use with .NET Core WPF applications.
 
 ### Background
 If we use the native WPF `Image` control for displaying images over the HTTP protocol (by setting the `Source` to an http url), the image will be downloaded from the server every time the control is loaded. 
 
-In its `Dedicated` mode (see `Cache Mode` below), the `Image` control present in this `CachedImage` library, wraps the native `Image` control to add a local file-system based caching capability. This control creates a local copy of the image on the first time an image is downloaded; to a configurable cache folder (defaults to `<current-user/appdata/roaming>\AppName\Cache`). All the subsequent loads of the control (or the page, window or app that contains the control), will display the image from the local file-system and will not download it from the server.
+In its `Dedicated` mode (see `Cache Mode` below), the `Image` control present in this `CachedImage.Core` library, wraps the native `Image` control to add a local file-system based caching capability. This control creates a local copy of the image on the first time an image is downloaded; to a configurable cache folder (defaults to `<current-user/appdata/roaming>\AppName\Cache`). All the subsequent loads of the control (or the page, window or app that contains the control), will display the image from the local file-system and will not download it from the server.
 
 In its `WinINet` mode, the `Image` control uses the Temporary Internet Files directory that IE uses for the cache.
 
@@ -54,24 +51,7 @@ Using Package Manager Console:
 		Environment.GetFolderPath(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
 		"MyCustomCacheFolder");
   ```
-6. Please note that the dedicated cache mode does not consider `Cache-Control` or `Expires` headers. Unless the cache folder (or specific files in it) gets deleted, the control will not fetch the file again from the server. The application could let the end-user empty the cache folder as done in the [flickr downloadr](https://github.com/flickr-downloadr/flickr-downloadr) application that uses this control.
-
-### Thanks
-All of the code in this library is from the answers on a Stack Overflow question:
-
-[How do I cache images on the client for a WPF application?](http://stackoverflow.com/questions/1878060/how-do-i-cache-images-on-the-client-for-a-wpf-application). 
-
-Thanks to:
-
-1. [Simon Hartcher](http://stackoverflow.com/users/459159/simon-hartcher), who answered his own question [with the solution](http://stackoverflow.com/questions/1878060/how-do-i-cache-images-on-the-client-for-a-wpf-application/1893173#1893173)
-
-2. [Jeroen van Langen](http://stackoverflow.com/users/641271/jeroen-van-langen) for [the wonderful refacoring](http://stackoverflow.com/questions/1878060/how-do-i-cache-images-on-the-client-for-a-wpf-application/5175424#5175424) of Simon's solution
-
-3. [Ivan Leonenko](http://stackoverflow.com/users/367287/ivan-leonenko) for [the tweaks to make the control bindable](http://stackoverflow.com/questions/1878060/how-do-i-cache-images-on-the-client-for-a-wpf-application/12638859#12638859).
-
-4. [Aybe](https://github.com/aybe) for the fix for non-ascii characters in the path ([#1](https://github.com/floydpink/CachedImage/pull/1))
-
-5. [Stackie Jia](https://github.com/stackia) for the enhancement of adding another IE based caching ([#5](https://github.com/floydpink/CachedImage/pull/5))
+7. Please note that the dedicated cache mode does not consider `Cache-Control` or `Expires` headers. Unless the cache folder (or specific files in it) gets deleted, the control will not fetch the file again from the server. The application could let the end-user empty the cache folder as done in the [flickr downloadr](https://github.com/flickr-downloadr/flickr-downloadr) application that uses this control.
 
 ### License
 

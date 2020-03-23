@@ -1,4 +1,4 @@
-[CachedImage](http://floydpink.github.io/CachedImage/) [![NuGet version](https://badge.fury.io/nu/CachedImage.png)](http://badge.fury.io/nu/CachedImage) [![Build status](https://ci.appveyor.com/api/projects/status/6tb8p301yio5fmh4)](https://ci.appveyor.com/project/floydpink/cachedimage)
+[![NuGet version](https://badge.fury.io/nu/CachedImage.Core.png)](https://badge.fury.io/nu/CachedImage.Core)
 ===========
 
 <a href="http://floydpink.github.io/CachedImage/"><img src="http://floydpink.github.io/CachedImage/images/logo.png" alt="logo" width="300px" /></a>
@@ -17,41 +17,42 @@ We provide two cache mode: `WinINet` mode and `Dedicated` mode.
 * `WinINet`: This is the default mode and it takes advantage of `BitmapImage.UriCachePolicy` property and uses the Temporary Internet Files directory of IE to store cached images. The image control will have the same cache policy of IE.
 * `Dedicated`: Another url-based cache implementation. You can set your own cache directory. The cache will never expire unless you delete the cache folder manually.
 
+### Installation
+Using Package Manager Console:
+`PM> Install-Package CachedImage.Core`
+
 ### Usage
-1. Install the NuGet package named `CachedImage` on the WPF project 
-2. Add a namespace reference to the `CachedImage` assembly on the Window/Usercontrol `xmlns:cachedImage="clr-namespace:CachedImage;assembly=CachedImage"` as in the example `Window` below:
+1. Install the NuGet package named `CachedImage.Core` on the WPF project 
+2. Add a namespace reference to the `CachedImage.Core` assembly on the Window/Usercontrol `xmlns:cachedImage="clr-namespace:CachedImage.Core;assembly=CachedImage.Core"` as in the example `Window` below:
   ```xml
   <Window x:Class="MyWindow1"
           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-          xmlns:cachedImage="clr-namespace:CachedImage;assembly=CachedImage">
+          xmlns:cachedImage="clr-namespace:CachedImage.Core;assembly=CachedImage.Core">
   
   </Window>
   ```
 3. Use the control and set or bind the `ImageUrl` attribute:
   ```xml
-  
-      <cachedImage:Image ImageUrl="{Binding LargeImageUrl}">  </cachedImage:Image>
+      <cachedImage:Image ImageUrl="{Binding LargeImageUrl}" />
   ```
 4. As it is only a wrapper, all the XAML elements that could be used with the `Image` control are valid here as well:
   ```xml
-  
     <cachedImage:Image ImageUrl="{Binding LargeImageUrl}">
         <Image.ToolTip>This image gets cached to the file-system the first time it is downloaded</Image.ToolTip>
     </cachedImage:Image>
   ```
-5. To change cache mode, set FileCache.AppCacheMode like this:
+5. To change cache mode, set `FileCache.AppCacheMode` like this:
   ```csharp
-  
-    CachedImage.FileCache.AppCacheMode = CachedImage.FileCache.CacheMode.Dedicated; // The default mode is WinINet
+    CachedImage.Core.FileCache.AppCacheMode = CachedImage.Core.FileCache.CacheMode.Dedicated; // The default mode is WinINet
   ```
 6. To change the cache folder location of the dedicated cache mode, set the static string property named `AppCacheDirectory` of the `FileCache` class like this:
   ```csharp
-  
-    CachedImage.FileCache.AppCacheDirectory = string.format("{0}\\MyCustomCacheFolder\\",
-                                  Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+    CachedImage.Core.FileCache.AppCacheDirectory = Path.Combine(
+		Environment.GetFolderPath(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+		"MyCustomCacheFolder");
   ```
 6. Please note that the dedicated cache mode does not consider `Cache-Control` or `Expires` headers. Unless the cache folder (or specific files in it) gets deleted, the control will not fetch the file again from the server. The application could let the end-user empty the cache folder as done in the [flickr downloadr](https://github.com/flickr-downloadr/flickr-downloadr) application that uses this control.
 

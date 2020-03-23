@@ -23,8 +23,10 @@ namespace CachedImage.Core
         static FileCache()
         {
             // default cache directory - can be changed if needed from App.xaml
-            AppCacheDirectory =
-                $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\{Process.GetCurrentProcess().ProcessName}\\Cache\\";
+            AppCacheDirectory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                Process.GetCurrentProcess().ProcessName,
+                "Cache");
             AppCacheMode = CacheMode.WinINet;
         }
 
@@ -58,7 +60,7 @@ namespace CachedImage.Core
             }
 
             var fileName = fileNameBuilder.ToString();
-            var localFile = $"{AppCacheDirectory}\\{fileName}";
+            var localFile = Path.Combine(AppCacheDirectory, fileName);
             var memoryStream = new MemoryStream();
 
             FileStream fileStream = null;
